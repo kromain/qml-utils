@@ -10,18 +10,15 @@ import "jsonpath.js" as JSONPath
 Item {
     property string source: ""
     property string json: ""
-    property string jsonAnt: ""
     property string query: ""
     property string propId: "" // If this property is defined (unique identifier of each object) we'll update only the changes without destroying everything
     
     property ListModel model : ListModel { id: jsonModel }
     property alias count: jsonModel.count
-    function get(index){
-
-        return jsonModel.get(index);
-    }
-
+    
     signal jsonModelChanged;
+    
+    jsonAnt: ""
 
     onSourceChanged: {
         var xhr = new XMLHttpRequest;
@@ -59,7 +56,8 @@ Item {
             objectArray = parseJSONString(json, query);
             var objectArrayAnt = parseJSONString(jsonAnt, query);
 
-            //detecto los insertados y modificados
+            // Detect new and modified elements
+            
             for (i = 0; i < objectArray.length; ++i ) {
                 id = objectArray[i][propId];
                 found = false;
@@ -81,17 +79,17 @@ Item {
                     if (JSON.stringify(objectArray[i]) !== JSON.stringify(objectArrayAnt[j]))
                     {
                         console.log("modified " + id + " index " + j);
-                        //jsonModel.set(j, objectArray[i]);
+                        // jsonModel.set(j, objectArray[i]); // Don't because set() merges properties instead of replacing
                         jsonModel.remove(j);
                         jsonModel.insert(j, objectArray[i]);
                     }
                 }
             }
 
-            //detecto los borrados
+            // Detect the removed elements
+            
             for (i = objectArrayAnt.length - 1; i >= 0; --i ) {
                 id = objectArrayAnt[i][propId];
-                console.log(id);
                 found = false;
                 for (j = objectArray.length - 1; j >= 0; --j ) {
                     if (id === objectArray[j][propId])
