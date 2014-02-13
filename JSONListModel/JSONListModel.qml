@@ -18,7 +18,7 @@ Item {
     
     signal jsonModelChanged;
     
-    jsonAnt: ""
+    property string jsonAnt: ""
 
     onSourceChanged: {
         var xhr = new XMLHttpRequest;
@@ -51,7 +51,6 @@ Item {
         }
         else
         {
-            console.log("option 3");
             var i, j, id, found;
             objectArray = parseJSONString(json, query);
             var objectArrayAnt = parseJSONString(jsonAnt, query);
@@ -71,15 +70,16 @@ Item {
 
                 if (!found)
                 {
-                    console.log("insert " + id);
                     jsonModel.append(objectArray[i]);
                 }
                 else
                 {
                     if (JSON.stringify(objectArray[i]) !== JSON.stringify(objectArrayAnt[j]))
                     {
-                        console.log("modified " + id + " index " + j);
-                        // jsonModel.set(j, objectArray[i]); // Don't because set() merges properties instead of replacing
+                        // Don't do the following because set() merges properties instead of replacing
+                        // Instead we remove it and insert it
+                        // jsonModel.set(j, objectArray[i]);
+                        
                         jsonModel.remove(j);
                         jsonModel.insert(j, objectArray[i]);
                     }
@@ -100,7 +100,6 @@ Item {
                 }
                 if (!found)
                 {
-                    console.log("deleted " + id + " index " + i);
                     jsonModel.remove(i);
                 }
             }
