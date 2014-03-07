@@ -21,7 +21,6 @@ Item {
     property ListModel model : ListModel { id: jsonModel }
     property alias count: jsonModel.count
 
-    onJsonChanged: updateJSONModel()
     onQueryChanged: updateJSONModel()
 
     function refresh() {
@@ -31,8 +30,10 @@ Item {
         if (contentType !== "")
             xhr.setRequestHeader("Content-Type", contentType);
         xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE)
+            if (xhr.readyState === XMLHttpRequest.DONE) {
                 json = xhr.responseText;
+                updateJSONModel();
+            }
         }
         xhr.send(postData);
     }
