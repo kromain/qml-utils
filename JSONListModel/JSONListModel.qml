@@ -21,25 +21,35 @@ Item {
     property ListModel model : ListModel { id: jsonModel }
     property alias count: jsonModel.count
 
-    onQueryChanged: updateJSONModel()
-
     function refresh() {
         loading = true;
         var xhr = new XMLHttpRequest;
+        console.log("Sending request to JSON API")
+        console.log("Request Type: "+requestType);
+        console.log("Source: "+source);
         xhr.open(requestType, source);
         if (contentType !== "")
             xhr.setRequestHeader("Content-Type", contentType);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.log(xhr.responseText);
+                console.log(xhr.getAllResponseHeaders());
                 json = xhr.responseText;
                 updateJSONModel();
             }
         }
-        xhr.send(postData);
+        console.log("Post Data: "+postData)
+        if (requestType == "POST") {
+            xhr.send(postData);
+        } else {
+            xhr.send()
+        }
     }
 
     function updateJSONModel() {
-        jsonModel.clear();
+        if (jsonModel.count > 0) {
+            jsonModel.clear();
+        }
 
         if ( json === "") {
             loading = false;
@@ -51,7 +61,7 @@ Item {
         var objectArray = parseJSONString(json, query);
         for ( var key in objectArray ) {
             var jo = objectArray[key];
-            jsonModel.append( jo );
+            jsonModel.append(jo);
         }
         loading = false;
         listModelUpdate = !listModelUpdate;
@@ -63,5 +73,9 @@ Item {
             objectArray = JSONPath.jsonPath(objectArray, jsonPathQuery);
 
         return objectArray;
+    }
+
+    function clear() {
+        jsonModel.clear();
     }
 }
